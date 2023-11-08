@@ -7,11 +7,8 @@
     "dev": "nodemon --config nodemon.json src/app.ts",
     "debug": "npm run dev --inspect",
     "build": "tsc",
-    "start": "node build/app.js"
+    "start": "node dist/app.js"
   },
-  "keywords": [],
-  "author": "Kelvin Omozokpia",
-  "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
