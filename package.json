@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json src/app.ts",
     "debug": "npm run dev --inspect",
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "start": "node dist/app.js"
   },
