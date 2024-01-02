@@ -146,9 +146,7 @@ Follow these steps to set up and run the Mangalense backend on your local machin
 4. Set up environment variables:
 
    - Create a `.env` file in the root directory.
-   - Define the following variables:
-
-     ```env
+   - Define the following variables:     ```env
 ##### Database configuration
 DB_URL=your-connection-string
 
