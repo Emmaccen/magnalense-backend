@@ -169,7 +169,10 @@ The backend should be running at `http://localhost:4000`.
 
 Contributions to this project are welcome! Feel free to submit issues and pull requests.
 Also a list of possible upgrades/features are:
--implement file compression
+- Email confirmation for register feature
+- Forgot password and reset password functionality
+- Unit Tests
+- Image handling for the products controller
 For any inquiries or questions, feel free to contact [Tosiron Jegede](mailto:tosironj@gmail.com) or [Ezeokoli Goodness](mailto:goodnessezeokoli3@gmail.com). 
 ## License
 
