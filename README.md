@@ -172,8 +172,9 @@ Also a list of possible upgrades/features are:
 - Email confirmation for register feature
 - Forgot password and reset password functionality
 - Unit Tests
-- Image handling for the products controller
---
+- Image handling for the products controller.
+
+### Inquiries
 For any inquiries or questions, feel free to contact [Tosiron Jegede](mailto:tosironj@gmail.com) or [Ezeokoli Goodness](mailto:goodnessezeokoli3@gmail.com). 
 ## License
 
