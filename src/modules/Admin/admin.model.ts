@@ -1,22 +1,20 @@
-import { HydratedDocument, Schema, model, Document, Model, Types } from 'mongoose';
+import { HydratedDocument, Schema, model, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-interface User {
+interface Admin {
   name: string;
   email: string;
   password: string;
-  isSuspended: boolean;
   publicKey?: string;
   role: string;
-  cart:Types.ObjectId,
   createJWT: (publicKey: string) => string;
   comparePasswords: (candidatePassword: String) => Promise<boolean>;
 }
 
-export interface UserDocument extends User, Document {}
+export interface AdminDocument extends Admin, Document {}
 
-const UserSchema = new Schema<UserDocument>(
+const AdminSchema = new Schema<AdminDocument>(
   {
     name: {
       type: String,
@@ -35,30 +33,20 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       required: [true, 'Please provide a password'],
     },
-    isSuspended: {
-      type: Boolean,
-      default: false,
-    },
     publicKey: {
       type: String,
     },
-    cart:[
-      {
-        type: Schema.Types.ObjectId,
-        ref: "products",
-      },
-    ],
     role: {
       type: String,
-      default: 'user',
+      default: 'admin',
     },
   },
   { timestamps: true }
 );
 
-export type UserModel = Model<UserDocument>;
+export type AdminModel = Model<AdminDocument>;
 
-UserSchema.pre('save', async function (next) {
+AdminSchema.pre('save', async function (next) {
   try {
     if (this.isModified('password') || this.isNew) {
       const salt = await bcrypt.genSalt(10);
@@ -72,8 +60,8 @@ UserSchema.pre('save', async function (next) {
   }
 });
 
-UserSchema.methods.createJWT = function (
-  this: UserDocument,
+AdminSchema.methods.createJWT = function (
+  this: AdminDocument,
   publicKey?: string
 ): string {
   return jwt.sign(
@@ -89,14 +77,14 @@ UserSchema.methods.createJWT = function (
   );
 };
 
-UserSchema.methods.comparePasswords = async function (
+AdminSchema.methods.comparePasswords = async function (
   candidatePassword: string
 ): Promise<boolean> {
-  const user = this as UserDocument;
+  const user = this as AdminDocument;
   const isMatch = await bcrypt.compare(candidatePassword, user.password);
   return isMatch;
 };
 
-const User = model<UserDocument, UserModel>('User', UserSchema);
+const Admin = model<AdminDocument, AdminModel>('Admin', AdminSchema);
 
-export default User;
+export default Admin;

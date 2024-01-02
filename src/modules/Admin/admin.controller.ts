@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpResponseCodes } from '../../enums/HttpResponseCodes';
 import { BadRequest, Unauthenticated } from '../../common/errors/index';
-import User, { UserDocument } from './user.model';
-import bcrypt from 'bcrypt';
+import Admin, { AdminDocument } from './admin.model';
 import { generatePublicKey } from '../../common/utils/generatePublicKey';
+import User, {UserDocument} from '../user/user.model';
 
 export const register = async (
   req: Request,
@@ -18,16 +18,16 @@ export const register = async (
     }
 
     // Check for existing users
-    const emailAlreadyExists = await User.findOne({ email });
+    const emailAlreadyExists = await Admin.findOne({ email });
     if (emailAlreadyExists) {
       throw new BadRequest('Email already exists');
     }
 
-    const user = await User.create({
+    const user = await Admin.create({
       name,
       email,
       password,
-      role: 'user',
+      role: 'admin',
     });
     const publicKey = generatePublicKey();
     // const token = user.createJWT();
@@ -47,8 +47,7 @@ export const register = async (
         name: user.name,
         email: user.email,
         role: user.role,
-        // wishlist: user.wishlist,
-        isSuspended: user.isSuspended,
+        
       },
       token,
     });
@@ -72,14 +71,12 @@ export const login = async (
       throw new Unauthenticated('Please provide email and password');
     }
 
-    const user: UserDocument | null = await User.findOne({ email });
+    const user: AdminDocument | null = await Admin.findOne({ email });
 
     if (!user) {
-      throw new Unauthenticated('User does not exist');
+      throw new Unauthenticated('Admin account does not exist');
     }
-    if (user.isSuspended) {
-      throw new Unauthenticated('You are currently suspended, Please contact the admin');
-    }
+    
     const isPasswordCorrect: boolean = await user.comparePasswords(
       password.trim()
     );
@@ -108,7 +105,7 @@ export const login = async (
         name: user.name,
         email: user.email,
         role: user.role,
-        isSuspended: user.isSuspended,
+        
       },
       token,
     });
@@ -131,11 +128,12 @@ export const logout = async (
     });
 
     const userId = req.user?.userId;
+    console.log(req.user)
     if (!userId) {
       throw new Unauthenticated('User not authenticated');
     }
 
-    const user: UserDocument | null = await User.findById(userId);
+    const user: AdminDocument | null = await Admin.findById(userId);
 
     if (!user) {
       throw new Unauthenticated('User not found');
@@ -144,6 +142,80 @@ export const logout = async (
     await user.updateOne({ $set: { publicKey: null } });
 
     res.status(HttpResponseCodes.OK).json({ message: 'Logout successful' });
+  } catch (error: any) {
+    console.error(error.message);
+    res.status(HttpResponseCodes.INTERNAL_SERVER_ERROR).json(error.message);
+  }
+};
+
+export const viewAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (req.user?.role !== 'admin') {
+      throw new BadRequest('Only admins can view all users');
+    }
+    const users = await User.find({}, ' -publicKey -password');
+
+    res.status(HttpResponseCodes.OK).json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSingleUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    if (req.user?.role !== 'admin') {
+      throw new BadRequest('Only admins can view user details');
+    }
+
+    const user: UserDocument | null = await User.findById(userId, '-password -publicKey');
+
+    if (!user) {
+      throw new BadRequest('User not found');
+    }
+
+    res.status(HttpResponseCodes.OK).json({ success: true, user });
+  } catch (error: any) {
+    console.error(error.message);
+    res.status(HttpResponseCodes.INTERNAL_SERVER_ERROR).json(error.message);
+  }
+};
+
+export const toggleSuspension = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    if (req.user?.role !== 'admin') {
+      throw new BadRequest('Only admins can suspend/unsuspend users');
+    }
+ 
+    const user: UserDocument | null = await User.findById(userId);
+ 
+    if (!user) {
+      throw new BadRequest('User not found');
+    }
+    user.isSuspended = !user.isSuspended;
+
+    await user.updateOne({ $set: { isSuspended: user.isSuspended } });
+
+    const successMessage = user.isSuspended
+      ? 'User suspended successfully'
+      : 'User unsuspended successfully';
+
+    res.status(HttpResponseCodes.OK).json({ success: true, msg: successMessage });
   } catch (error: any) {
     console.error(error.message);
     res.status(HttpResponseCodes.INTERNAL_SERVER_ERROR).json(error.message);

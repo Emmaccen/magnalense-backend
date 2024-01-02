@@ -1,5 +1,7 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import cors from 'cors';
-import 'dotenv/config';
+import cookieParser from "cookie-parser";
 import express from 'express';
 import { connect } from './common/database/connect';
 import log from './common/logger';
@@ -11,6 +13,7 @@ const port = configService('port');
 const app = express();
 
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

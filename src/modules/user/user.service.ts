@@ -4,7 +4,7 @@ import User from './user.model';
 export async function checkUserHandler(req: Request, res: Response) {
   try {
     const { type, value } = req.query;
-
+ 
     const user = await User.findOne({ type, value });
 
     if (!user) {
