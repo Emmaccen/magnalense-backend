@@ -146,20 +146,23 @@ Follow these steps to set up and run the Mangalense backend on your local machin
 4. Set up environment variables:
 
    - Create a `.env` file in the root directory.
-   - Define the following variables:     ```env
-##### Database configuration
-DB_URL=your-connection-string
 
-#### JWT secret key
-JWT_SECRET=your-secret-key
+   - Define the following variables in the `.env` file:
 
-### Others
-NODE_ENV=development
-PORT=4000
- 
-```
+     ```env
+     # Database configuration
+     DB_URL=your-connection-string
 
-     Replace `your_secret_key` with a secure key for JWT authentication.
+     # JWT secret key
+     JWT_SECRET=your-secret-key
+
+     # Others
+     NODE_ENV=development
+     PORT=4000
+     ```
+
+   - Replace `your-secret-key` with a secure key for JWT authentication.
+
 
 5. Run the server:
 
