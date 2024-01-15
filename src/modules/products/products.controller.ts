@@ -7,7 +7,6 @@ import { Types } from 'mongoose';
 
 //Technical debts
 // - Image handling with multer?
-// - Possible pagination?
 // - Possible refactor to remove reviews controller from products
 // - Pagination for reviews
 // - Use numbers for roles instead of strings
@@ -17,7 +16,9 @@ export const getAllProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { title, color, frameMaterial, lensMaterial, category } = req.query;
+    const { title, color, frameMaterial, lensMaterial, category, page = '1' } = req.query;
+    const pageSize = 20;
+    const skip = (parseInt(page as string, 10) - 1) * pageSize;
 
     const searchCriteria: Record<string, any> = {};
     if (title) searchCriteria.title = new RegExp(title as string, 'i');
@@ -32,6 +33,8 @@ export const getAllProducts = async (
         path: 'reviews.user',
         select: '-password -publicKey',
       })
+      .skip(skip)
+      .limit(pageSize)
       .exec();
 
     if (ViewProducts.length < 1) {
@@ -49,6 +52,7 @@ export const getAllProducts = async (
     res.status(HttpResponseCodes.INTERNAL_SERVER_ERROR).json(error.message);
   }
 };
+
 
 export const getSingleProduct = async (
   req: Request,

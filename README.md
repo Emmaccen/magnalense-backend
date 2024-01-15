@@ -181,7 +181,7 @@ Also a list of possible upgrades/features are:
 - Image handling for the products controller.
 
 ### Inquiries
-For any inquiries or questions, feel free to contact [Tosiron Jegede](mailto:tosironj@gmail.com) or [Ezeokoli Goodness](mailto:goodnessezeokoli3@gmail.com). 
+For any inquiries or questions, feel free to contact [Tosiron Jegede](mailto:tosironj@gmail.com).
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
